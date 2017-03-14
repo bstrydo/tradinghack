@@ -4,8 +4,8 @@ namespace Common
 {
     public class Tick
     {
-        DateTime TimeStamp {get; }
-        double Price {get;}
+        public DateTime TimeStamp {get; }
+        public double Price {get;}
 
         public Tick(DateTime timeStamp, double price)
         {

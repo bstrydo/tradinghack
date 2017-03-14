@@ -1,4 +1,4 @@
-namespace hackerthon
+namespace Common
 {
     public enum AlgorithmResult
     {

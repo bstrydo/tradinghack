@@ -22,7 +22,7 @@ namespace Common.Tests
 
             noviceTrader.PlaceOrders();
 
-            mockExchange.Verify(e => e.Buy(symbol, expectedNumberOfShares));
+            mockExchange.Verify(e => e.Buy(symbol, expectedNumberOfShares, price));
         }
 
         [Fact]
@@ -32,15 +32,15 @@ namespace Common.Tests
             var portfolio = new Dictionary<string, double>() { { "GOOGL", 0.75 }, { "AAPL", 0.25 } };
             var currentStockPrices = new Dictionary<string, double>() { { "GOOGL", 845.10 }, { "AAPL", 143.66 } };
             NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentStockQuantities, portfolio, currentStockPrices, availableCapital);
-            var actualBuyOrders = new List<Tuple<string, int>>();
+            var actualBuyOrders = new List<Tuple<string, int, double>>();
             mockExchange
-                .Setup(e => e.Buy(It.IsAny<string>(), It.IsAny<int>()))
-                .Callback<string, int>((symbol, numberOfShares) => actualBuyOrders.Add(new Tuple<string, int>(symbol, numberOfShares)));
+                .Setup(e => e.Buy(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<double>()))
+                .Callback<string, int, double>((symbol, numberOfShares, price) => actualBuyOrders.Add(new Tuple<string, int, double>(symbol, numberOfShares, price)));
 
             noviceTrader.PlaceOrders();
 
-            Assert.Equal(actualBuyOrders[0], new Tuple<string, int>("GOOGL", 887));
-            Assert.Equal(actualBuyOrders[1], new Tuple<string, int>("AAPL", 1740));
+            Assert.Equal(actualBuyOrders[0], new Tuple<string, int, double>("GOOGL", 887, 845.10));
+            Assert.Equal(actualBuyOrders[1], new Tuple<string, int, double>("AAPL", 1740, 143.66));
         }
 
         [Fact]
@@ -53,8 +53,8 @@ namespace Common.Tests
 
             noviceTrader.PlaceOrders();
 
-            mockExchange.Verify(e => e.Sell("GOOGL", 295));
-            mockExchange.Verify(e => e.Buy("AAPL", 1740));
+            mockExchange.Verify(e => e.Sell("GOOGL", 295, 845.10));
+            mockExchange.Verify(e => e.Buy("AAPL", 1740, 143.66));
         }
     }
 }

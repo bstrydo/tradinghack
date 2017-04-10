@@ -34,11 +34,11 @@ namespace Common
             int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / currentStockPrices[symbol]);
             if (shareDifference > 0)
             {
-                exchange.Buy(symbol, noOfSharesToTransact);
+                exchange.Buy(symbol, noOfSharesToTransact, currentStockPrices[symbol]);
             }
             else
             {
-                exchange.Sell(symbol, noOfSharesToTransact);
+                exchange.Sell(symbol, noOfSharesToTransact, currentStockPrices[symbol]);
             }
         }
     }

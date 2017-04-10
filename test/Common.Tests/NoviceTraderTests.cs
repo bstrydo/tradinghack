@@ -10,24 +10,15 @@ namespace Common.Tests
         private Mock<Exchange> mockExchange = new Mock<Exchange>();
         private double availableCapital = 1000000.00;
 
-        [Fact]
-        public void CanPlaceASellOrder()
-        {
-            var portfolio = new Dictionary<string, double>() { { "Apple", 92.61 } };
-            var currentStockPrices = new Dictionary<string, double>() { { "Apple", 143.66 } };
-            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, portfolio, currentStockPrices, availableCapital);
-            noviceTrader.Sell();
-            mockExchange.Verify(e => e.Sell());
-        }
-
         [Theory]
         [InlineData("AAPL", 143.66, 6960)]
         [InlineData("GOOGL", 845.10, 1183)]
-        public void GivenLongPositionShouldBuy(string symbol, double price, int expectedNumberOfShares)
+        public void PlaceOrders_CurrentPortfolioWithSingleLongPosition_PlaceBuyOrder(string symbol, double price, int expectedNumberOfShares)
         {
+            var currentPortfolio = new Dictionary<string, double>() { { symbol, 0 } };
             var portfolio = new Dictionary<string, double>() { { symbol, 1 } };
             var currentStockPrices = new Dictionary<string, double>() { { symbol, price } };
-            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, portfolio, currentStockPrices, availableCapital);
+            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentPortfolio, portfolio, currentStockPrices, availableCapital);
 
             noviceTrader.PlaceOrders();
 
@@ -35,11 +26,12 @@ namespace Common.Tests
         }
 
         [Fact]
-        public void GivenMultipleLongPositionsShouldBuy()
+        public void PlaceOrders_MultipleLongPositions_PlaceWeightedBuyOrders()
         {
+            var currentPortfolio = new Dictionary<string, double>() { { "GOOGL", 0 }, { "AAPL", 0 } };
             var portfolio = new Dictionary<string, double>() { { "GOOGL", 0.75 }, { "AAPL", 0.25 } };
             var currentStockPrices = new Dictionary<string, double>() { { "GOOGL", 845.10 }, { "AAPL", 143.66 } };
-            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, portfolio, currentStockPrices, availableCapital);
+            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentPortfolio, portfolio, currentStockPrices, availableCapital);
             var actualBuyOrders = new List<Tuple<string, int>>();
             mockExchange
                 .Setup(e => e.Buy(It.IsAny<string>(), It.IsAny<int>()))
@@ -49,6 +41,20 @@ namespace Common.Tests
 
             Assert.Equal(actualBuyOrders[0], new Tuple<string, int>("GOOGL", 887));
             Assert.Equal(actualBuyOrders[1], new Tuple<string, int>("AAPL", 1740));
+        }
+
+        [Fact]
+        public void PlaceOrders_CurrentPortfolio_BuyAndSellToMatch()
+        {
+            var currentPortfolio = new Dictionary<string, double>() { { "GOOGL", 0.75 }, { "AAPL", 0.25 } };
+            var targetPortfolio = new Dictionary<string, double>() { { "GOOGL", 0.50 }, { "AAPL", 0.50 } };
+            var currentStockPrices = new Dictionary<string, double>() { { "GOOGL", 845.10 }, { "AAPL", 143.66 } };
+            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentPortfolio, targetPortfolio, currentStockPrices, availableCapital);
+
+            noviceTrader.PlaceOrders();
+
+            mockExchange.Verify(e => e.Sell("GOOGL", 295));
+            mockExchange.Verify(e => e.Buy("AAPL", 1740));
         }
     }
 }

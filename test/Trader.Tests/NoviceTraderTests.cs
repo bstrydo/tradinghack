@@ -3,7 +3,7 @@ using System;
 using Xunit;
 using Moq;
 
-namespace Common.Tests
+namespace Trader.Tests
 {
     public class NoviceTraderTests
     {

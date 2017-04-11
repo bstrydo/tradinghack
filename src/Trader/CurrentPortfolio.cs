@@ -1,8 +1,7 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Common
+namespace Trader
 {
     public class CurrentPortfolio
     {

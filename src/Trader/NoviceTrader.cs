@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Common
+namespace Trader
 {
     public class NoviceTrader
     {

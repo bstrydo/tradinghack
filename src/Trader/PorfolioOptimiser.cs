@@ -7,10 +7,10 @@ namespace Trader
     public class PortfolioOptimiser
     {
         private Dictionary<string, double> portfolio;
-        private List<HistoricPrice> historicPrices;
-        private List<ForecastPrice> forecastPrices;
+        private Dictionary<string, List<double>> historicPrices;
+        private Dictionary<string, List<double>> forecastPrices;
 
-        public PortfolioOptimiser(List<HistoricPrice> historicPrices, List<ForecastPrice> forecastPrices)
+        public PortfolioOptimiser(Dictionary<string, List<double>> historicPrices, Dictionary<string, List<double>> forecastPrices)
         {
             this.historicPrices = historicPrices;
             this.forecastPrices = forecastPrices;
@@ -18,11 +18,8 @@ namespace Trader
 
         public void Optimise()
         {
-            var orderedHistoricPrices = historicPrices.OrderBy(p => p.Symbol);
-            var orderedForecastPrices = forecastPrices.OrderBy(p => p.Symbol);
-            double totalChange = orderedHistoricPrices.Zip(orderedForecastPrices, (h, f) => f.Price / h.Price - 1).Sum();
-            portfolio = orderedHistoricPrices.Zip(orderedForecastPrices, (h, f) => new Tuple<string, double>(h.Symbol, (f.Price / h.Price - 1) / totalChange))
-                .ToDictionary(x => x.Item1, x => x.Item2);
+            double totalChange = historicPrices.Keys.Sum(s => forecastPrices[s][0] / historicPrices[s][0] - 1);
+            portfolio = historicPrices.Keys.ToDictionary(s => s, s => (forecastPrices[s][0] / historicPrices[s][0] - 1) / totalChange);
         }
 
         public Dictionary<string, double> Portfolio

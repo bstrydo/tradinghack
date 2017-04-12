@@ -6,14 +6,12 @@ namespace Trader
 {
     public class PortfolioOptimiser
     {
-        private Dictionary<string, int> currentStockQuantities;
         private Dictionary<string, double> portfolio;
         private List<HistoricPrice> historicPrices;
         private List<ForecastPrice> forecastPrices;
 
-        public PortfolioOptimiser(Dictionary<string, int> currentStockQuantities, List<HistoricPrice> historicPrices, List<ForecastPrice> forecastPrices)
+        public PortfolioOptimiser(List<HistoricPrice> historicPrices, List<ForecastPrice> forecastPrices)
         {
-            this.currentStockQuantities = currentStockQuantities;
             this.historicPrices = historicPrices;
             this.forecastPrices = forecastPrices;
         }

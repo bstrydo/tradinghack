@@ -9,12 +9,12 @@ namespace Trader
         [Theory]
         [InlineData("AAPL", 143.17, 145.23)]
         [InlineData("GOOGL", 824.17, 824.73)]
-        public void Optimise_StockGoingUp_LongStock(string symbol, double historicPrice, double futurePrice)
+        public void Optimise_StockGoingUp_LongStock(string symbol, double historicPrice, double forecastPrice)
         {
-            var historicPrices = new Dictionary<string, List<double>>()
-                {{ symbol, new List<double>{ historicPrice }}};
-            var forecastPrices = new Dictionary<string, List<double>>()
-                {{ symbol, new List<double>{ futurePrice }}};
+            var historicPrices = new Dictionary<string, List<HistoricPrice>>()
+                {{ symbol, new List<HistoricPrice> { new HistoricPrice(historicPrice) }}};
+            var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
+                {{ symbol, new List<ForecastPrice> { new ForecastPrice(forecastPrice) }}};
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
 
             portfolioOptimiser.Optimise();
@@ -25,15 +25,15 @@ namespace Trader
         [Fact]
         public void Optimise_StocksGoingUp_LongStocks()
         {
-            var historicPrices = new Dictionary<string, List<double>>()
+            var historicPrices = new Dictionary<string, List<HistoricPrice>>()
                 {
-                    { "GOOGL", new List<double> { 824.17 } },
-                    { "AAPL", new List<double> { 143.17 } }
+                    { "GOOGL", new List<HistoricPrice> { new HistoricPrice(824.17) } },
+                    { "AAPL", new List<HistoricPrice> { new HistoricPrice(143.17) } }
                 };
-            var forecastPrices = new Dictionary<string, List<double>>()
+            var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
                 {
-                    { "GOOGL", new List<double> { 840.65 } },
-                    { "AAPL", new List<double> { 146.03 } }
+                    { "GOOGL", new List<ForecastPrice> { new ForecastPrice(840.65) } },
+                    { "AAPL", new List<ForecastPrice> { new ForecastPrice(146.03) } }
                 };
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
 
@@ -48,10 +48,10 @@ namespace Trader
         [Fact]
         public void Portfolio_RetrieveBeforeOptimise_ShouldThrowInvalidOperationException()
         {
-            var historicPrices = new Dictionary<string, List<double>>()
-                {{ "AAPL", new List<double>{ 143.17 }}};
-            var forecastPrices = new Dictionary<string, List<double>>()
-                {{ "AAPL", new List<double>{ 146.03 }}};
+            var historicPrices = new Dictionary<string, List<HistoricPrice>>()
+                {{ "AAPL", new List<HistoricPrice> { new HistoricPrice(143.17) }}};
+            var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
+                {{ "AAPL", new List<ForecastPrice> { new ForecastPrice(146.03) }}};
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
 
             var exception = Assert.Throws<InvalidOperationException>(() => portfolioOptimiser.Portfolio);

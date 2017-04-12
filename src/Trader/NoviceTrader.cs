@@ -11,7 +11,7 @@ namespace Trader
         private double availableCapital;
         private CurrentPortfolio currentPortfolio;
 
-        public NoviceTrader(Exchange exchange, Dictionary <string, int> currentStockQuantities, Dictionary<string, double> targetPortfolioWeight, Dictionary<string, double> currentStockPrices, double availableCapital)
+        public NoviceTrader(Exchange exchange, Dictionary<string, int> currentStockQuantities, Dictionary<string, double> targetPortfolioWeight, Dictionary<string, double> currentStockPrices, double availableCapital)
         {
             this.exchange = exchange;
             this.targetPortfolioWeight = targetPortfolioWeight;
@@ -31,7 +31,7 @@ namespace Trader
         private void PlaceOrder(string symbol)
         {
             double shareDifference = currentPortfolio.Total > 0 ? Math.Round(targetPortfolioWeight[symbol] - currentPortfolio.Value(symbol) / currentPortfolio.Total, 2) : targetPortfolioWeight[symbol];
-            int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / currentStockPrices[symbol]);
+            int noOfSharesToTransact = (int)Math.Floor(availableCapital * Math.Abs(shareDifference) / currentStockPrices[symbol]);
             if (shareDifference > 0)
             {
                 exchange.Buy(symbol, noOfSharesToTransact, currentStockPrices[symbol]);

@@ -11,7 +11,7 @@ namespace Trader
         [InlineData("GOOGL", 824.17, 824.73)]
         public void Optimise_StockGoingUp_LongStock(string symbol, double historicPrice, double forecastPrice)
         {
-            Stock stock = new Stock(symbol, new List<HistoricPrice>() { new HistoricPrice(new DateTime(2017,3,1), historicPrice) }, new ForecastPrice(forecastPrice));
+            Stock stock = new Stock(symbol, new List<HistoricPrice>() { new HistoricPrice(new DateTime(2017, 3, 1), historicPrice) }, new ForecastPrice(forecastPrice));
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(new List<Stock>() { stock });
 
             portfolioOptimiser.Optimise();
@@ -57,7 +57,7 @@ namespace Trader
         [Fact]
         public void Get_Profile_BeforeOptimise_ShouldThrowInvalidOperationException()
         {
-            Stock stock = new Stock("GOOGL", new List<HistoricPrice>() { new HistoricPrice(new DateTime(2017,3,1), 824.17) }, new ForecastPrice(840.65));
+            Stock stock = new Stock("GOOGL", new List<HistoricPrice>() { new HistoricPrice(new DateTime(2017, 3, 1), 824.17) }, new ForecastPrice(840.65));
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(new List<Stock>() { stock });
 
             var exception = Assert.Throws<InvalidOperationException>(() => portfolioOptimiser.Portfolio);

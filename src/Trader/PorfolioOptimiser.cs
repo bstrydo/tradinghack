@@ -24,8 +24,8 @@ namespace Trader
 
         public void Optimise()
         {
-            double totalChange = stocks.Sum(s => s.LatestForecastPrice / s.MostRecentHistoricPrice -1);
-            portfolio = stocks.ToDictionary(s => s.Symbol, s => (s.LatestForecastPrice / s.MostRecentHistoricPrice -1) / totalChange);
+            double totalChange = stocks.Sum(s => s.LatestForecastPrice / s.MostRecentHistoricPrice - 1);
+            portfolio = stocks.ToDictionary(s => s.Symbol, s => (s.LatestForecastPrice / s.MostRecentHistoricPrice - 1) / totalChange);
         }
 
         public Dictionary<string, double> Portfolio

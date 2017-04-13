@@ -18,8 +18,13 @@ namespace Trader
 
         public void Optimise()
         {
-            double totalChange = historicPrices.Keys.Sum(s => forecastPrices[s][0].Price / historicPrices[s][0].Price - 1);
-            portfolio = historicPrices.Keys.ToDictionary(s => s, s => (forecastPrices[s][0].Price / historicPrices[s][0].Price - 1) / totalChange);
+            double totalChange = historicPrices.Keys.Sum(s => forecastPrices[s][0].Price / GetLatestHistoricPrice(historicPrices[s]) - 1);
+            portfolio = historicPrices.Keys.ToDictionary(s => s, s => (forecastPrices[s][0].Price / GetLatestHistoricPrice(historicPrices[s]) - 1) / totalChange);
+        }
+
+        private double GetLatestHistoricPrice(List<HistoricPrice> historicPrices)
+        {
+            return historicPrices.OrderByDescending(p => p.Date).First().Price;
         }
 
         public Dictionary<string, double> Portfolio

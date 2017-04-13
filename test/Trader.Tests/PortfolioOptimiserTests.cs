@@ -12,7 +12,7 @@ namespace Trader
         public void Optimise_StockGoingUp_LongStock(string symbol, double historicPrice, double forecastPrice)
         {
             var historicPrices = new Dictionary<string, List<HistoricPrice>>()
-                {{ symbol, new List<HistoricPrice> { new HistoricPrice(historicPrice) }}};
+                {{ symbol, new List<HistoricPrice> { new HistoricPrice(new DateTime(2017,3,1), historicPrice) }}};
             var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
                 {{ symbol, new List<ForecastPrice> { new ForecastPrice(forecastPrice) }}};
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
@@ -27,8 +27,8 @@ namespace Trader
         {
             var historicPrices = new Dictionary<string, List<HistoricPrice>>()
                 {
-                    { "GOOGL", new List<HistoricPrice> { new HistoricPrice(824.17) } },
-                    { "AAPL", new List<HistoricPrice> { new HistoricPrice(143.17) } }
+                    { "GOOGL", new List<HistoricPrice> { new HistoricPrice(new DateTime(2017,3,1), 824.17) } },
+                    { "AAPL", new List<HistoricPrice> { new HistoricPrice(new DateTime(2017,3,1), 143.17) } }
                 };
             var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
                 {
@@ -46,16 +46,30 @@ namespace Trader
         }
 
         [Fact]
-        public void Portfolio_RetrieveBeforeOptimise_ShouldThrowInvalidOperationException()
+        public void Get_Profile_BeforeOptimise_ShouldThrowInvalidOperationException()
         {
             var historicPrices = new Dictionary<string, List<HistoricPrice>>()
-                {{ "AAPL", new List<HistoricPrice> { new HistoricPrice(143.17) }}};
+                {{ "AAPL", new List<HistoricPrice> { new HistoricPrice(new DateTime(2017,3,1), 143.17) }}};
             var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
                 {{ "AAPL", new List<ForecastPrice> { new ForecastPrice(146.03) }}};
             PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
 
             var exception = Assert.Throws<InvalidOperationException>(() => portfolioOptimiser.Portfolio);
             Assert.Equal("Can't retrieve portfolio before optimising", exception.Message);
+        }
+
+        [Fact]
+        public void Optimise_MultipleHistoricValuesGoingUp_LongStock()
+        {
+            var historicPrices = new Dictionary<string, List<HistoricPrice>>()
+                {{ "AAPL", new List<HistoricPrice> { new HistoricPrice(new DateTime(2017,3,1), 146.01), new HistoricPrice(new DateTime(2017,3,2), 143.17) }}};
+            var forecastPrices = new Dictionary<string, List<ForecastPrice>>()
+                {{ "AAPL", new List<ForecastPrice> { new ForecastPrice(145.23) }}};
+            PortfolioOptimiser portfolioOptimiser = new PortfolioOptimiser(historicPrices, forecastPrices);
+
+            portfolioOptimiser.Optimise();
+
+            Assert.Equal(new Dictionary<string, double>() { { "AAPL", 1 } }, portfolioOptimiser.Portfolio);
         }
     }
 }

@@ -5,24 +5,27 @@ namespace Trader
 {
     public class CurrentPortfolio
     {
-        private Dictionary<string, double> stockValue;
-        private double total;
+        private List<PortfolioItem> portfolioItems;
 
-        public CurrentPortfolio(Dictionary<string, int> quantity, Dictionary<string, double> price)
+        public CurrentPortfolio(Dictionary<string, int> quantity, List<Stock> stocks)
         {
-            this.stockValue = new Dictionary<string, double>();
-            foreach (var symbol in quantity.Keys)
+            this.portfolioItems = new List<PortfolioItem>();
+            foreach (var stock in stocks)
             {
-                stockValue[symbol] = quantity[symbol] * price[symbol];
+                portfolioItems.Add(new PortfolioItem(stock, quantity[stock.Symbol]));
             }
-            total = stockValue.Keys.Sum(s => Value(s));
         }
 
         public double Value(string symbol)
         {
-            return stockValue[symbol];
+            return portfolioItems.Single(i => i.Stock.Symbol == symbol).GetPortfolioValue();
         }
 
-        public double Total { get { return total; } }
+        public int Quantity(string symbol)
+        {
+            return portfolioItems.Single(i => i.Stock.Symbol == symbol).Quantity;
+        }
+
+        public double Total { get { return portfolioItems.Sum(s => s.GetPortfolioValue()); } }
     }
 }

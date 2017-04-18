@@ -44,7 +44,7 @@ namespace Trader.Tests
         }
 
         [Fact]
-        public void PlaceOrders_CurrentPortfolio_BuyAndSellToMatch()
+        public void PlaceOrders_CurrentPortfolioWeightsAboveZero_BuyAndSellToMatch()
         {
             var currentStockQuantities = new Dictionary<string, int>() { { "GOOGL", 887 }, { "AAPL", 1740 } };
             var targetPortfolio = new Dictionary<string, double>() { { "GOOGL", 0.50 }, { "AAPL", 0.50 } };
@@ -55,6 +55,20 @@ namespace Trader.Tests
 
             mockExchange.Verify(e => e.Sell("GOOGL", 295, 845.10));
             mockExchange.Verify(e => e.Buy("AAPL", 1740, 143.66));
+        }
+
+        [Fact]
+        public void PlaceOrders_CurrentPortfolioSomeWeightsBelowZero_BuyAndSellToMatch()
+        {
+            var currentStockQuantities = new Dictionary<string, int>() { { "GOOGL", 887 }, { "AAPL", 1740 } };
+            var targetPortfolio = new Dictionary<string, double>() { { "GOOGL", 0.50 }, { "AAPL", -0.50 } };
+            var currentStockPrices = new Dictionary<string, double>() { { "GOOGL", 845.10 }, { "AAPL", 143.66 } };
+            NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentStockQuantities, targetPortfolio, currentStockPrices, availableCapital);
+
+            noviceTrader.PlaceOrders();
+
+            mockExchange.Verify(e => e.Sell("GOOGL", 295, 845.10));
+            mockExchange.Verify(e => e.Sell("AAPL", 1740, 143.66));
         }
     }
 }

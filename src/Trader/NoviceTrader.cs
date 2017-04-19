@@ -30,27 +30,28 @@ namespace Trader
 
         public void PlaceOrders()
         {
-            foreach (TargetPortfolioItem targetPortfolioItem in targetPortfolio.PortfolioItems)
+            foreach (var item in from t in targetPortfolio.PortfolioItems
+                                 join l in livePortfolio.PortfolioItems on t.Stock equals l.Stock
+                                 select new { Stock = t.Stock, LiveQuantity = l.Quantity, SharePrice = l.SharePrice(), LiveValue = l.Value(), TargetWeight = t.Weight })
             {
-                var livePortfolioItem = livePortfolio.PortfolioItems.Single(i => i.Stock == targetPortfolioItem.Stock);
+                PlaceOrder(item.Stock, item.LiveQuantity, item.SharePrice, item.LiveValue, item.TargetWeight);
+            }
+        }
 
-                if (targetPortfolioItem.Weight < 0)
-                {
-                    exchange.Sell(livePortfolioItem.Stock, livePortfolioItem.Quantity, livePortfolioItem.SharePrice());
-                }
+        private void PlaceOrder(Stock stock, int liveQuantity, double sharePrice, double liveValue, double targetWeight)
+        {
+            if (targetWeight < 0)
+            {
+                exchange.Sell(stock, liveQuantity, sharePrice);
+            }
+            else
+            {
+                double portfolioWeightDifference = liveValue > 0 ? Math.Round(targetWeight - liveValue / livePortfolio.Value(), 2) : targetWeight;
+                int sharesToTransact = (int)Math.Floor(availableCapital * Math.Abs(portfolioWeightDifference) / sharePrice);
+                if (portfolioWeightDifference > 0)
+                    exchange.Buy(stock, sharesToTransact, sharePrice);
                 else
-                {
-                    double shareDifference = livePortfolio.Value() > 0 ? Math.Round(targetPortfolioItem.Weight - livePortfolioItem.Value() / livePortfolio.Value(), 2) : targetPortfolioItem.Weight;
-                    int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / livePortfolioItem.SharePrice());
-                    if (shareDifference > 0)
-                    {
-                        exchange.Buy(livePortfolioItem.Stock, noOfSharesToTransact, livePortfolioItem.SharePrice());
-                    }
-                    else
-                    {
-                        exchange.Sell(livePortfolioItem.Stock, noOfSharesToTransact, livePortfolioItem.SharePrice());
-                    }
-                }
+                    exchange.Sell(stock, sharesToTransact, sharePrice);
             }
         }
     }

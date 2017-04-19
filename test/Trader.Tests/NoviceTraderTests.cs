@@ -22,7 +22,7 @@ namespace Trader.Tests
 
             noviceTrader.PlaceOrders();
 
-            mockExchange.Verify(e => e.Buy(symbol, expectedNumberOfShares, price));
+            mockExchange.Verify(e => e.Buy(It.Is<Stock>(s => s.Symbol == symbol), expectedNumberOfShares, price));
         }
 
         [Fact]
@@ -34,13 +34,13 @@ namespace Trader.Tests
             NoviceTrader noviceTrader = new NoviceTrader(mockExchange.Object, currentStockQuantities, portfolio, currentStockPrices, availableCapital);
             var actualBuyOrders = new List<Tuple<string, int, double>>();
             mockExchange
-                .Setup(e => e.Buy(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<double>()))
-                .Callback<string, int, double>((symbol, numberOfShares, price) => actualBuyOrders.Add(new Tuple<string, int, double>(symbol, numberOfShares, price)));
+                .Setup(e => e.Buy(It.IsAny<Stock>(), It.IsAny<int>(), It.IsAny<double>()))
+                .Callback<Stock, int, double>((stock, numberOfShares, price) => actualBuyOrders.Add(new Tuple<string, int, double>(stock.Symbol, numberOfShares, price)));
 
             noviceTrader.PlaceOrders();
 
-            Assert.Equal(actualBuyOrders[0], new Tuple<string, int, double>("GOOGL", 887, 845.10));
-            Assert.Equal(actualBuyOrders[1], new Tuple<string, int, double>("AAPL", 1740, 143.66));
+            Assert.Equal(new Tuple<string, int, double>("GOOGL", 887, 845.10), actualBuyOrders[0]);
+            Assert.Equal(new Tuple<string, int, double>("AAPL", 1740, 143.66), actualBuyOrders[1]);
         }
 
         [Fact]
@@ -53,8 +53,8 @@ namespace Trader.Tests
 
             noviceTrader.PlaceOrders();
 
-            mockExchange.Verify(e => e.Sell("GOOGL", 295, 845.10));
-            mockExchange.Verify(e => e.Buy("AAPL", 1740, 143.66));
+            mockExchange.Verify(e => e.Sell(It.Is<Stock>(s => s.Symbol == "GOOGL"), 295, 845.10));
+            mockExchange.Verify(e => e.Buy(It.Is<Stock>(s => s.Symbol == "AAPL"), 1740, 143.66));
         }
 
         [Fact]
@@ -67,8 +67,8 @@ namespace Trader.Tests
 
             noviceTrader.PlaceOrders();
 
-            mockExchange.Verify(e => e.Sell("GOOGL", 295, 845.10));
-            mockExchange.Verify(e => e.Sell("AAPL", 1740, 143.66));
+            mockExchange.Verify(e => e.Sell(It.Is<Stock>(s => s.Symbol == "GOOGL"), 295, 845.10));
+            mockExchange.Verify(e => e.Sell(It.Is<Stock>(s => s.Symbol == "AAPL"), 1740, 143.66));
         }
     }
 }

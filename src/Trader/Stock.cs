@@ -37,5 +37,30 @@ namespace Trader
         {
             return currentPrice;
         }
+
+        public override bool Equals (object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            return Symbol == ((Stock) obj).Symbol;
+        }
+
+        public override int GetHashCode()
+        {
+            return Symbol.GetHashCode();
+        }
+
+        public static bool operator == (Stock a, Stock b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator != (Stock a, Stock b)
+        {
+            return !a.Equals(b);
+        }
     }
 }

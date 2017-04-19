@@ -16,6 +16,9 @@ namespace Trader
             }
         }
 
-        public double Value { get { return PortfolioItems.Sum(s => s.Value()); } }
+        public double Value()
+        {
+            return PortfolioItems.Sum(s => s.Value());
+        }
     }
 }

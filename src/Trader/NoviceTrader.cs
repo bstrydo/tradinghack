@@ -36,19 +36,19 @@ namespace Trader
 
                 if (portfolioItem.Weight < 0)
                 {
-                    exchange.Sell(livePortfolioItem.Stock, livePortfolioItem.Quantity, currentStockPrices[portfolioItem.Stock.Symbol]);
+                    exchange.Sell(livePortfolioItem.Stock, livePortfolioItem.Quantity, livePortfolioItem.SharePrice());
                 }
                 else
                 {
-                    double shareDifference = livePortfolio.Value > 0 ? Math.Round(portfolioItem.Weight - livePortfolioItem.Value() / livePortfolio.Value, 2) : portfolioItem.Weight;
-                    int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / currentStockPrices[portfolioItem.Stock.Symbol]);
+                    double shareDifference = livePortfolio.Value() > 0 ? Math.Round(portfolioItem.Weight - livePortfolioItem.Value() / livePortfolio.Value(), 2) : portfolioItem.Weight;
+                    int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / livePortfolioItem.SharePrice());
                     if (shareDifference > 0)
                     {
-                        exchange.Buy(portfolioItem.Stock, noOfSharesToTransact, currentStockPrices[portfolioItem.Stock.Symbol]);
+                        exchange.Buy(portfolioItem.Stock, noOfSharesToTransact, livePortfolioItem.SharePrice());
                     }
                     else
                     {
-                        exchange.Sell(portfolioItem.Stock, noOfSharesToTransact, currentStockPrices[portfolioItem.Stock.Symbol]);
+                        exchange.Sell(portfolioItem.Stock, noOfSharesToTransact, livePortfolioItem.SharePrice());
                     }
                 }
             }

@@ -12,7 +12,12 @@ namespace Trader
 
         public double Value()
         {
-            return Stock.CurrentPrice * Quantity;
+            return Stock.CurrentPrice() * Quantity;
+        }
+
+        public double SharePrice()
+        {
+            return Stock.CurrentPrice();
         }
     }
 }

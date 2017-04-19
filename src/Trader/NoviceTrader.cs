@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Trader
 {
@@ -9,7 +10,7 @@ namespace Trader
         private Dictionary<string, double> targetPortfolioWeight;
         private Dictionary<string, double> currentStockPrices;
         private double availableCapital;
-        private CurrentPortfolio currentPortfolio;
+        private LivePortfolio livePortfolio;
         private TargetPortfolio targetPortfolio;
 
         public NoviceTrader(Exchange exchange, Dictionary<string, int> currentStockQuantities, Dictionary<string, double> targetPortfolioWeight, Dictionary<string, double> currentStockPrices, double availableCapital)
@@ -23,21 +24,23 @@ namespace Trader
             {
                 stocks.Add(new Stock(symbol, currentStockPrices[symbol]));
             }
-            this.currentPortfolio = new CurrentPortfolio(currentStockQuantities, stocks);
+            this.livePortfolio = new LivePortfolio(currentStockQuantities, stocks);
             this.targetPortfolio = new TargetPortfolio(stocks, targetPortfolioWeight);
         }
 
         public void PlaceOrders()
         {
-            foreach (PortfolioItem portfolioItem in targetPortfolio.PortfolioItems)
+            foreach (TargetPortfolioItem portfolioItem in targetPortfolio.PortfolioItems)
             {
+                var livePortfolioItem = livePortfolio.PortfolioItems.Single(i => i.Stock.Symbol == portfolioItem.Stock.Symbol);
+
                 if (portfolioItem.Weight < 0)
                 {
-                    exchange.Sell(portfolioItem.Stock.Symbol, currentPortfolio.Quantity(portfolioItem.Stock.Symbol), currentStockPrices[portfolioItem.Stock.Symbol]);
+                    exchange.Sell(livePortfolioItem.Stock.Symbol, livePortfolioItem.Quantity, currentStockPrices[portfolioItem.Stock.Symbol]);
                 }
                 else
                 {
-                    double shareDifference = currentPortfolio.Total > 0 ? Math.Round(portfolioItem.Weight - currentPortfolio.Value(portfolioItem.Stock.Symbol) / currentPortfolio.Total, 2) : portfolioItem.Weight;
+                    double shareDifference = livePortfolio.Total > 0 ? Math.Round(portfolioItem.Weight - livePortfolioItem.Value() / livePortfolio.Total, 2) : portfolioItem.Weight;
                     int noOfSharesToTransact = (int) Math.Floor(availableCapital * Math.Abs(shareDifference) / currentStockPrices[portfolioItem.Stock.Symbol]);
                     if (shareDifference > 0)
                     {

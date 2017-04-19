@@ -8,7 +8,7 @@ namespace Trader
         public string Symbol { get; private set; }
         private List<HistoricPrice> historicPrices;
         private ForecastPrice forecastPrice;
-        private double currentPrice;
+        public double CurrentPrice { get; private set; }
 
         public Stock(string symbol, List<HistoricPrice> historicPrices, ForecastPrice forecastPrice)
         {
@@ -20,14 +20,10 @@ namespace Trader
         public Stock(string symbol, double currentPrice)
         {
             Symbol = symbol;
-            this.currentPrice = currentPrice;
+            this.CurrentPrice = currentPrice;
         }
 
         public double MostRecentHistoricPrice { get { return historicPrices.OrderByDescending(p => p.Date).First().Price; } }
         public double LatestForecastPrice { get { return forecastPrice.Price; } }
-        public double ComputeValue(int quantity)
-        {
-            return currentPrice * quantity;
-        }
     }
 }

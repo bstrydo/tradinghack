@@ -3,13 +3,11 @@ using System.Collections.Generic;
 
 namespace Trader
 {
-    public class LivePortfolio
+    public class LivePortfolio : Portfolio
     {
-        public  List<LivePortfolioItem> PortfolioItems { get; private set; }
-
         public LivePortfolio(Dictionary<string, int> quantity, List<Stock> stocks)
         {
-            this.PortfolioItems = new List<LivePortfolioItem>();
+            PortfolioItems = new List<PortfolioItem>();
             foreach (var stock in stocks)
             {
                 PortfolioItems.Add(new LivePortfolioItem(stock, quantity[stock.Symbol]));
@@ -18,7 +16,7 @@ namespace Trader
 
         public double Value()
         {
-            return PortfolioItems.Sum(s => s.Value());
+            return PortfolioItems.Sum(s => (s as LivePortfolioItem).Value());
         }
     }
 }

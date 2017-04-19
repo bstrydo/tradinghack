@@ -32,26 +32,26 @@ namespace Trader
         {
             foreach (var item in from t in targetPortfolio.PortfolioItems
                                  join l in livePortfolio.PortfolioItems on t.Stock equals l.Stock
-                                 select new { Stock = t.Stock, LiveQuantity = l.Quantity, SharePrice = l.SharePrice(), LiveValue = l.Value(), TargetWeight = t.Weight })
+                                 select new { t, l })
             {
-                PlaceOrder(item.Stock, item.LiveQuantity, item.SharePrice, item.LiveValue, item.TargetWeight);
+                PlaceOrder(item.t as TargetPortfolioItem, item.l as LivePortfolioItem);
             }
         }
 
-        private void PlaceOrder(Stock stock, int liveQuantity, double sharePrice, double liveValue, double targetWeight)
+        private void PlaceOrder(TargetPortfolioItem target, LivePortfolioItem live)
         {
-            if (targetWeight < 0)
+            if (target.Weight < 0)
             {
-                exchange.Sell(stock, liveQuantity, sharePrice);
+                exchange.Sell(target.Stock, live.Quantity, live.SharePrice());
             }
             else
             {
-                double portfolioWeightDifference = liveValue > 0 ? Math.Round(targetWeight - liveValue / livePortfolio.Value(), 2) : targetWeight;
-                int sharesToTransact = (int)Math.Floor(availableCapital * Math.Abs(portfolioWeightDifference) / sharePrice);
+                double portfolioWeightDifference = live.Value() > 0 ? Math.Round(target.Weight - live.Value() / livePortfolio.Value(), 2) : target.Weight;
+                int sharesToTransact = (int)Math.Floor(availableCapital * Math.Abs(portfolioWeightDifference) / live.SharePrice());
                 if (portfolioWeightDifference > 0)
-                    exchange.Buy(stock, sharesToTransact, sharePrice);
+                    exchange.Buy(target.Stock, sharesToTransact, live.SharePrice());
                 else
-                    exchange.Sell(stock, sharesToTransact, sharePrice);
+                    exchange.Sell(target.Stock, sharesToTransact, live.SharePrice());
             }
         }
     }
